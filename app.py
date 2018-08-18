@@ -24,12 +24,35 @@ def showAll():
     mycursor.execute("Select * from invoice")
     result = mycursor.fetchall()
     print result
-    return "result"
+    return json.dumps(result)
+
+@app.route('/filterInvoice', methods=['POST'])
+def filterInvoice():
+    req = request.form['invoice_id']
+    mycursor.execute("Select * from invoice where invoice_id LIKE '%"+req+"%'")
+    result = mycursor.fetchall()
+    print result
+    return json.dumps(result)
+
+@app.route('/getItems', methods=['POST'])
+def getItems():
+    req = request.form['invoice_id']
+    mycursor.execute("Select * from items where invoice_id = '" + req + "'")
+    result = mycursor.fetchall()
+    print result
+    return json.dumps(result)
 
 @app.route('/createInvoice', methods=['POST'])
 def createInvoice():
     req = request.form
-    # print req
+    
+    default_val = ""
+
+    name = req.get('name', default_val)
+    email = req.get('email', default_val)
+    phone = req.get('phone', default_val)
+    address = req.get('address', default_val)
+    pincode = req.get('pincode', default_val)
 
     # keyList = ""
     # valList = ""
@@ -50,25 +73,39 @@ def createInvoice():
     # # print valList
 
     # sql= "INSERT INTO invoice ("+ keyList + ") values (" + valList + ")"
-    print req['created_at']
 
-    sql = "INSERT INTO invoice (invoice_id,created_at,tax,discount,discount_percent,total,tax_percent,subtotal) values ('"+ req['invoice_id']+ "', '" + req['created_at'] + "'," + req['tax'] + "," + req['discount'] + "," + req['discount_percent'] + "," + req['total'] + "," + req['tax_percent'] + "," + req['subtotal'] + ")"
+    sql = "INSERT INTO invoice (invoice_id,created_at,tax,discount,discount_percent,total,tax_percent,subtotal, name, email, phone, address, pincode) values ('"+ req['invoice_id']+ "', '" + req['created_at'] + "'," + req['tax'] + "," + req['discount'] + "," + req['discount_percent'] + "," + req['total'] + "," + req['tax_percent'] + "," + req['subtotal'] + ",'" + name + "','" + email + "','" + phone + "','" + address + "','" + pincode + "')"
 
     print sql
 
-    mycursor.execute(sql)
+    try:
+        mycursor.execute(sql)
+        mydb.commit()
+        print(mycursor.rowcount, "record inserted.")
+        return json.dumps(req)
+    except:
+        return "exception caught"
 
-    mydb.commit()
-
-    print(mycursor.rowcount, "record inserted.")
-
-    return json.dumps(req)
 
 @app.route('/createItems', methods=['POST'])
 def createItems():
-    x = request.form
-    print x
-    return json.dumps(x)
+    req = request.form
+    # print req
+
+
+
+    sql = "INSERT INTO items (invoice_id, name, quantity, price) values ('" + req['invoice_id'] + "','" + req['name'] + "','" + req['quantity'] + "','" + req['price'] + "')"
+
+    print sql
+
+    try:
+        mycursor.execute(sql)
+        mydb.commit()
+        print(mycursor.rowcount, "record inserted.")
+        return json.dumps(req)
+    except:
+        return "exception caught"
+
 
 if __name__ == '__main__':
     app.run(debug=True)
