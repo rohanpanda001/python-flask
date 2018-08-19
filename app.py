@@ -3,8 +3,10 @@ from flask import Flask
 from flask import request
 import json
 import mysql.connector
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)
 
 mydb = mysql.connector.connect(
     host="localhost",
@@ -21,17 +23,15 @@ def home():
 
 @app.route('/showAll', methods=['POST'])
 def showAll():
-    mycursor.execute("Select * from invoice")
+    mycursor.execute("Select * from invoice order by id desc")
     result = mycursor.fetchall()
-    print result
     return json.dumps(result)
 
 @app.route('/filterInvoice', methods=['POST'])
 def filterInvoice():
     req = request.form['invoice_id']
-    mycursor.execute("Select * from invoice where invoice_id LIKE '%"+req+"%'")
+    mycursor.execute("Select * from invoice where invoice_id LIKE '%"+req+"%' order by id desc")
     result = mycursor.fetchall()
-    print result
     return json.dumps(result)
 
 @app.route('/getItems', methods=['POST'])
@@ -39,7 +39,6 @@ def getItems():
     req = request.form['invoice_id']
     mycursor.execute("Select * from items where invoice_id = '" + req + "'")
     result = mycursor.fetchall()
-    print result
     return json.dumps(result)
 
 @app.route('/createInvoice', methods=['POST'])
@@ -83,28 +82,27 @@ def createInvoice():
         mydb.commit()
         print(mycursor.rowcount, "record inserted.")
         return json.dumps(req)
-    except:
-        return "exception caught"
+    except Exception, err:
+        return "exception caught ", Exception,err
 
 
 @app.route('/createItems', methods=['POST'])
 def createItems():
-    req = request.form
-    # print req
+    req = request.json
+    for item in req['items']:
 
+        sql = "INSERT INTO items (invoice_id, name, quantity, price) values ('" + req['invoice_id'] + "','" + item['name'] + "','" + item['quantity'] + "','" + item['price'] + "')"
 
+        print sql
 
-    sql = "INSERT INTO items (invoice_id, name, quantity, price) values ('" + req['invoice_id'] + "','" + req['name'] + "','" + req['quantity'] + "','" + req['price'] + "')"
+        try:
+            mycursor.execute(sql)
+            mydb.commit()
+            print(mycursor.rowcount, "record inserted.")
+        except Exception,err:
+            print "exception caught ", Exception,err
 
-    print sql
-
-    try:
-        mycursor.execute(sql)
-        mydb.commit()
-        print(mycursor.rowcount, "record inserted.")
-        return json.dumps(req)
-    except:
-        return "exception caught"
+    return "correct"
 
 
 if __name__ == '__main__':
