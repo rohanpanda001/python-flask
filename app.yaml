@@ -2,6 +2,11 @@ runtime: python
 env: flex
 entrypoint: python app.py
 
+# cloud_sql_instances : "invoicemanagement-213907:us-central1:database"
+env_variables:
+    CLOUDSQL_CONNECTION_NAME: invoicemanagement-213907:us-central1:database
+    CLOUDSQL_USER: root
+
 runtime_config:
   python_version: 3
 

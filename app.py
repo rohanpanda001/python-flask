@@ -75,15 +75,15 @@ def createInvoice():
 
     sql = "INSERT INTO invoice (invoice_id,created_at,tax,discount,discount_percent,total,tax_percent,subtotal, name, email, phone, address, pincode) values ('"+ req['invoice_id']+ "', '" + req['created_at'] + "'," + req['tax'] + "," + req['discount'] + "," + req['discount_percent'] + "," + req['total'] + "," + req['tax_percent'] + "," + req['subtotal'] + ",'" + name + "','" + email + "','" + phone + "','" + address + "','" + pincode + "')"
 
-    print(sql)
+    print sql
 
     try:
         mycursor.execute(sql)
         mydb.commit()
         print(mycursor.rowcount, "record inserted.")
         return json.dumps(req)
-    except Exception:
-        return ("exception caught ", Exception)
+    except Exception, err:
+        return "exception caught ", Exception,err
 
 
 @app.route('/createItems', methods=['POST'])
@@ -93,14 +93,14 @@ def createItems():
 
         sql = "INSERT INTO items (invoice_id, name, quantity, price) values ('" + req['invoice_id'] + "','" + item['name'] + "','" + item['quantity'] + "','" + item['price'] + "')"
 
-        print(sql)
+        print sql
 
         try:
             mycursor.execute(sql)
             mydb.commit()
             print(mycursor.rowcount, "record inserted.")
-        except Exception:
-            print ("exception caught", Exception)
+        except Exception,err:
+            print "exception caught ", Exception,err
 
     return "correct"
 
