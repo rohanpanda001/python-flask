@@ -1,15 +1,16 @@
 
-## git clone
+## Clone the repo
 
-Clone the repo
+git clone
 
-## pip install -r requirements.txt 
+##  Install all the dependencies
 
-Install all the dependencies
+pip install -r requirements.txt 
 
-## mysql -u root
+## Start mysql server 
 
-Start mysql server 
+sudo service mysql start
+mysql -u root
 
 ## Set up Database
 
@@ -21,7 +22,15 @@ import all the commands in invoice.sql and items.sql
 
 ## python app.py
 
-Open another terminal
-Run it on localhost
+Server is up and running on localhost
+
+## If you face any problem running the server 
+
+$ sudo mysql -u root
+mysql> USE mysql;
+mysql> UPDATE user SET plugin='mysql_native_password' WHERE User='root';
+mysql> FLUSH PRIVILEGES;
+mysql> exit;
+
  
  
